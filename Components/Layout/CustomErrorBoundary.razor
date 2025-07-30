@@ -1,0 +1,19 @@
+﻿@inherits ErrorBoundary
+@inject ILogger<CustomErrorBoundary> Logger
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else if (ErrorContent is not null)
+{
+    @ErrorContent(CurrentException)
+}
+
+@code {
+    protected override Task OnErrorAsync(Exception ex)
+    {
+        Logger.LogError(ex, "An error occurred inside a component!");
+        return Task.CompletedTask;
+    }
+}

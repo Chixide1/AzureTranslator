@@ -1,0 +1,45 @@
+﻿<div class="d-flex justify-center pt-18">
+    <MudPaper Class="pa-6" Elevation="2" Style="width: fit-content;">
+        <MudStack Spacing="4">
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Square="true" ContentAlignment="HorizontalAlignment.Center">
+                Something went wrong
+            </MudAlert>
+
+            <MudStack Spacing="2">
+                <MudButton OnClick="OnExpandCollapseClick">@(_expanded ? "Hide Error" : "View Error")</MudButton>
+                <MudDivider />
+                <MudCollapse Expanded="_expanded">
+                    @ErrorMessage
+                </MudCollapse>
+            </MudStack>
+            <MudStack AlignItems="AlignItems.Center">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Refresh"
+                           OnClick="HandleTryAgainClick">
+                    Try Again
+                </MudButton>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+</div>
+
+@code {
+    private bool _expanded = false;
+
+    [Parameter]
+    public string ErrorMessage { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnTryAgain { get; set; }
+
+    private void OnExpandCollapseClick()
+    {
+        _expanded = !_expanded;
+    }
+
+    private async Task HandleTryAgainClick()
+    {
+        await OnTryAgain.InvokeAsync();
+    }
+}
