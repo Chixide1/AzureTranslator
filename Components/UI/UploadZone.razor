@@ -10,7 +10,7 @@
     }
 </style>
 
-<MudStack Style="width: 100%" Class="mt-3">
+<div Style="width: 100%; padding-top: 0.75rem;">
     <MudFileUpload T="IReadOnlyList<IBrowserFile>"
                    @ref="@_fileUpload"
                    OnFilesChanged="OnInputFileChanged"
@@ -27,7 +27,7 @@
                       Outlined="true"
                       Class="@_dragClass">
 
-                @if(_fileNames.Count == 0)
+                @if(Files.Count == 0)
                 {
                     <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Style="height: 100%;">
                         <MudIcon Style="font-size: 4rem;" Icon="@Icons.Material.Filled.CloudUpload"></MudIcon>
@@ -37,11 +37,11 @@
                     </MudStack>
                 }
 
-                @foreach (var file in _fileNames)
+                @foreach (var file in Files)
                 {
                     <MudChip T="string"
                              Color="Color.Dark"
-                             Text="@file"
+                             Text="@file.Name"
                              Class="overflow-hidden"
                              tabindex="-1" />
                 }
@@ -51,31 +51,31 @@
     <MudToolBar Gutters="@false"
                 Class="relative d-flex justify-end gap-4">
         <MudButton Color="Color.Primary"
-                   Disabled="@(!_fileNames.Any())"
+                   Disabled="@(!Files.Any())"
                    OnClick="@HandleUpload"
                    Variant="Variant.Filled">
             Upload
         </MudButton>
         <MudButton Color="Color.Error"
-                   Disabled="@(!_fileNames.Any())"
+                   Disabled="@(!Files.Any())"
                    OnClick="@ClearAsync"
                    Variant="Variant.Filled">
             Clear
         </MudButton>
     </MudToolBar>
-</MudStack>
+</div>
 
 @code {
     private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
     private string _dragClass = DefaultDragClass;
-    private readonly List<string> _fileNames = new();
+    public List<IBrowserFile> Files { get; set; } = [];
     private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;
-    public EventCallback OnUpload { get; set; }
+    [Parameter] public EventCallback OnUpload { get; set; }
 
     private async Task ClearAsync()
     {
         await (_fileUpload?.ClearAsync() ?? Task.CompletedTask);
-        _fileNames.Clear();
+        Files.Clear();
         ClearDragClass();
     }
 
@@ -83,9 +83,10 @@
     {
         ClearDragClass();
         var files = e.GetMultipleFiles();
+
         foreach (var file in files)
         {
-            _fileNames.Add(file.Name);
+            Files.Add(file);
         }
     }
 

@@ -7,7 +7,7 @@ public interface IAzureTranslatorService
     /// </summary>
     Task TranslateDocs(string sourceContainerName,
         string targetContainerName,
-        string targetLanguage,
         string targetFolderName,
+        string targetLanguage = "en",
         CancellationToken cancellationToken = default);
 }
