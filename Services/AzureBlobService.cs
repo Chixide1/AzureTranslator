@@ -58,7 +58,7 @@ public class AzureBlobService(IConfiguration config, ILogger<AzureBlobService> l
         return containerClient.GenerateSasUri(builder);
     }
 
-    public async Task<Uri?> GenerateBlobSas(string containerName, string blobName, string fileName)
+    public async Task<Uri> GenerateBlobSas(string containerName, string blobName, string fileName)
     {
         try
         {
@@ -73,11 +73,8 @@ public class AzureBlobService(IConfiguration config, ILogger<AzureBlobService> l
             
             if (!exists)
             {
-                logger.LogWarning("Blob {FileName} not found in container {ContainerName}", 
-                    blobName, containerName);
-                return null;
+                throw new FileNotFoundException($"Blob {blobName} not found in container {containerName}");
             }
-
 
             var sasBuilder = new BlobSasBuilder
             {
@@ -100,7 +97,7 @@ public class AzureBlobService(IConfiguration config, ILogger<AzureBlobService> l
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unable to generate Sas URI for {Filename}", fileName);
-                return null;
+                throw new InvalidOperationException($"Unable to generate Sas URI for {fileName}", ex);
             }
 
         }
@@ -112,7 +109,7 @@ public class AzureBlobService(IConfiguration config, ILogger<AzureBlobService> l
         }
     }
 
-    public async Task<BlobClient?> GetBlob(string containerName, string fileName)
+    public async Task<BlobClient> GetBlob(string containerName, string fileName)
     {
         try
         {
@@ -129,7 +126,7 @@ public class AzureBlobService(IConfiguration config, ILogger<AzureBlobService> l
             {
                 logger.LogWarning("Blob {FileName} not found in container {ContainerName}",
                     fileName, containerName);
-                return null;
+                throw new FileNotFoundException($"Blob {fileName} not found in container {containerName}");
             }
 
             logger.LogInformation("Successfully retrieved blob {FileName} from container {ContainerName}",

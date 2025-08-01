@@ -1,0 +1,49 @@
+﻿<MudAutocomplete T="string"
+                 @bind-Value="SelectedLanguage"
+                 SearchFunc="SearchLang"
+                 Variant="Variant.Outlined"
+                 Label="Translate Text To"
+                 Class="mt-10"
+                 Strict="false"
+                 CoerceText="true"
+                 MaxItems="null"
+                 ShrinkLabel="true"/>
+
+@code {
+    public static Dictionary<string, string> Languages { get; } = new()
+    {
+        { "Afrikaans", "af" }, { "Albanian", "sq" }, { "Arabic", "ar" }, { "Azerbaijani Latin", "az" },
+        { "Bashkir", "ba" }, { "Basque", "eu" }, { "Bosnian Latin", "bs" }, { "Bulgarian", "bg" },
+        { "Cantonese Traditional", "yue" }, { "Catalan", "ca" }, { "Chinese Literary", "lzh" }, { "Chinese Simplified", "zh-Hans" },
+        { "Chinese Traditional", "zh-Hant" }, { "Croatian", "hr" }, { "Czech", "cs" }, { "Danish", "da" },
+        { "Dutch", "nl" }, { "English", "en" }, { "Estonian", "et" }, { "Faroese", "fo" },
+        { "Fijian", "fj" }, { "Filipino", "fil" }, { "Finnish", "fi" }, { "French", "fr" },
+        { "French Canada", "fr-ca" }, { "Galician", "gl" }, { "German", "de" }, { "Haitian Creole", "ht" },
+        { "Hindi", "hi" }, { "Hmong Daw Latin", "mww" }, { "Hungarian", "hu" }, { "Icelandic", "is" },
+        { "Indonesian", "id" }, { "Interlingua", "ia" }, { "Inuinnaqtun", "ikt" }, { "Inuktitut Latin", "iu-Latn" },
+        { "Irish", "ga" }, { "Italian", "it" }, { "Japanese", "ja" }, { "Kannada", "kn" },
+        { "Kazakh Cyrillic", "kk" }, { "Kazakh Latin", "kk-latn" }, { "Korean", "ko" }, { "Kurdish Latin Northern", "kmr" },
+        { "Kyrgyz Cyrillic", "ky" }, { "Latvian", "lv" }, { "Lithuanian", "lt" }, { "Macedonian", "mk" },
+        { "Malagasy", "mg" }, { "Malay Latin", "ms" }, { "Malayalam", "ml" }, { "Maltese", "mt" },
+        { "Maori", "mi" }, { "Marathi", "mr" }, { "Mongolian Cyrillic", "mn-Cyrl" }, { "Nepali", "ne" },
+        { "Norwegian Bokmal", "nb" }, { "Polish", "pl" }, { "Portuguese Brazil", "pt" }, { "Portuguese Portugal", "pt-pt" },
+        { "Punjabi", "pa" }, { "Queretaro Otomi", "otq" }, { "Romanian", "ro" }, { "Russian", "ru" },
+        { "Samoan Latin", "sm" }, { "Serbian Cyrillic", "sr-Cyrl" }, { "Serbian Latin", "sr" }, { "Slovak", "sk" },
+        { "Slovenian", "sl" }, { "Somali", "so" }, { "Spanish", "es" }, { "Swahili Latin", "sw" },
+        { "Swedish", "sv" }, { "Tahitian", "ty" }, { "Tamil", "ta" }, { "Tatar Latin", "tt" },
+        { "Telugu", "te" }, { "Tongan", "to" }, { "Turkish", "tr" }, { "Turkmen Latin", "tk" },
+        { "Ukrainian", "uk" }, { "Upper Sorbian", "hsb" }, { "Uzbek Latin", "uz" }, { "Vietnamese", "vi" },
+        { "Welsh", "cy" }, { "Yucatec Maya", "yua" }, { "Zulu", "zu" }
+    };
+
+    public string SelectedLanguage { get; private set; } = "English";
+
+    private async Task<IEnumerable<string>> SearchLang(string value, CancellationToken token = default)
+    {
+        await Task.Delay(5, token);
+
+        if (string.IsNullOrEmpty(value)) return Languages.Keys;
+
+        return Languages.Keys.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+}

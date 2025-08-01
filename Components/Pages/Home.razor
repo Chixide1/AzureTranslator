@@ -16,89 +16,76 @@
 
 @if (_downloadReady)
 {
-    <MudStack Class="mt-20" AlignItems="AlignItems.Center" Justify="Justify.Center" Style="width: 100%">
-        <MudAlert Variant="Variant.Outlined" Severity="Severity.Success">Translation Complete!</MudAlert>
-        <MudText Typo="Typo.body1" Class="mb-4">Your translated files are ready for download.</MudText>
-
-        <MudStack Row Spacing="2">
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Download"
-                       OnClick="DownloadFiles">
-                Download Translated Files
-            </MudButton>
-            <MudButton Variant="Variant.Outlined"
-                       StartIcon="@Icons.Material.Filled.AddToPhotos"
-                       Color="Color.Primary"
-                       OnClick="StartNew">
-                Translate More Files
-            </MudButton>
-        </MudStack>
-    </MudStack>
+    <DownloadSection Files="_files" OnStartNew="StartNew" />
 }
 
 <div class="@(_isLoading || _downloadReady ? "d-none" : "")">
+    <LangSelector @ref="_langSelect" />
     <UploadZone OnUpload="Upload" @ref="_uploadZone" />
 </div>
 
 @code {
     private bool _isLoading = false;
     private bool _downloadReady = false;
-    private List<UploadedFile> files = [];
+    private List<UploadedFile> _files = [];
     private UploadZone? _uploadZone;
-    private string _uploadZoneClass = string.Empty;
+    private LangSelector? _langSelect;
     private string _currentFolderName = string.Empty;
 
-    @inject IAzureTranslatorService _azureTranslatorService;
-    @inject IAzureBlobService _azureBlobService;
+    @inject IAzureTranslatorService AzureTranslatorService;
+    @inject IAzureBlobService AzureBlobService;
 
     private async Task Upload()
     {
         _isLoading = true;
-        _uploadZoneClass = "d-none";
         StateHasChanged();
 
         _currentFolderName = Guid.CreateVersion7().ToString();
 
         foreach (var file in _uploadZone?.Files ?? [])
         {
-            var blobName = await _azureBlobService.UploadFile(
+            var blobName = await AzureBlobService.UploadFile(
                 file,
                 "source-docs",
                 _currentFolderName
             );
 
-            files.Add(new UploadedFile
+            _files.Add(new UploadedFile
             {
                 Name = file.Name,
                 BlobName = blobName
             });
         }
 
-        await _azureTranslatorService.TranslateDocs(
+        await AzureTranslatorService.TranslateDocs(
             "source-docs",
             "translated-docs",
-            _currentFolderName
+            _currentFolderName,
+            LangSelector.Languages[_langSelect?.SelectedLanguage ?? "English"]
         );
 
+        foreach (var file in _files)
+        {
+            var blob = await AzureBlobService.GetBlob("source-docs", file.BlobName);
+            await blob.DeleteIfExistsAsync();   
+        }
+
         _uploadZone?.Files.Clear();
-        _uploadZoneClass = string.Empty;
         _isLoading = false;
         _downloadReady = true;
         StateHasChanged();
     }
 
-    private async Task DownloadFiles()
+    private async Task StartNew()
     {
-        // TODO: Implement download logic
-        // You'll need to get the translated files from the "translated-docs" container
-        // using the _currentFolderName and trigger downloads
-    }
+        foreach (var file in _files)
+        {
+            var blob = await AzureBlobService.GetBlob("translated-docs", file.BlobName);
+            await blob.DeleteIfExistsAsync();
+        }
 
-    private void StartNew()
-    {
         _downloadReady = false;
-        files.Clear();
+        _files.Clear();
         _currentFolderName = string.Empty;
         StateHasChanged();
     }

@@ -25,6 +25,7 @@
         <ActivatorContent>
             <MudPaper Height="300px"
                       Outlined="true"
+                      Style="border-color: var(--mud-palette-lines-inputs)"
                       Class="@_dragClass">
 
                 @if(Files.Count == 0)
@@ -66,7 +67,7 @@
 </div>
 
 @code {
-    private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
+    private const string DefaultDragClass = "relative rounded-lg border-1 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
     private string _dragClass = DefaultDragClass;
     public List<IBrowserFile> Files { get; set; } = [];
     private MudFileUpload<IReadOnlyList<IBrowserFile>>? _fileUpload;

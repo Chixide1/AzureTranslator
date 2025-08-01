@@ -19,6 +19,8 @@ public class AzureTranslatorService(IConfiguration config,
     {
         try
         {
+            await blobService.GetOrCreateContainer(targetContainerName);
+
             var sourceContainerUri = await blobService.GenerateContainerSasUri(sourceContainerName);
             var targetContainerUri = await blobService.GenerateContainerSasUri(targetContainerName, writeAccess: true);
 

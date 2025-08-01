@@ -8,12 +8,12 @@ public interface IAzureBlobService
     /// <summary>
     /// Gets a blob client for a specific file in a container.
     /// </summary>
-    Task<BlobClient?> GetBlob(string containerName, string fileName);
+    Task<BlobClient> GetBlob(string containerName, string fileName);
 
     /// <summary>
     /// Generates a SAS URI for a blob.
     /// </summary>
-    Task<Uri?> GenerateBlobSas(string containerName, string blobName, string fileName);
+    Task<Uri> GenerateBlobSas(string containerName, string blobName, string fileName);
 
     /// <summary>
     /// Gets a container or if the container doesn't exist, one will be created.
