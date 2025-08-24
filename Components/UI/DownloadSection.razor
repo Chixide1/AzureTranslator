@@ -1,6 +1,10 @@
 ﻿@using AzureTranslator.Models
 @using AzureTranslator.Services
 
+@inject IAzureBlobService AzureBlobService
+@inject IJSRuntime JsRuntime
+
+
 <MudStack Class="mt-20" AlignItems="AlignItems.Center" Justify="Justify.Center" Style="width: 100%">
     <MudAlert Variant="Variant.Outlined" Severity="Severity.Success">Translation Complete!</MudAlert>
     <MudText Typo="Typo.body1" Class="mb-4">Your translated files are ready for download.</MudText>
@@ -24,10 +28,7 @@
 @code {
     [Parameter] public List<UploadedFile> Files { get; set; } = [];
     [Parameter] public EventCallback OnStartNew { get; set; }
-
-    @inject IAzureBlobService AzureBlobService
-    @inject IJSRuntime JSRuntime
-
+    
     private async Task DownloadFiles()
     {
         var downloadUrls = new List<string>();
@@ -49,14 +50,16 @@
             ";
 
             await Task.Delay(500);
-            await JSRuntime.InvokeVoidAsync("eval", jsCode);
+            await JsRuntime.InvokeVoidAsync("eval", jsCode);
         }
 
         foreach (var file in Files)
         {
-            var blob = await AzureBlobService.GetBlob("source-docs", file.BlobName);
+            var blob = await AzureBlobService.GetBlob("translated-docs", file.BlobName);
             await blob.DeleteIfExistsAsync();
         }
+        
+        await OnStartNew.InvokeAsync();
     }
 
     private async Task StartNew()
